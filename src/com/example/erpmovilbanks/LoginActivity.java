@@ -23,7 +23,6 @@ public class LoginActivity extends Activity {
 	private AccountManager accountManager;
 	private String authTokenType;
 	private Bundle mResultBundle = null;
-	private Context context;
 	EditText user;
 	EditText password;
 	String mUser = "";
@@ -90,7 +89,8 @@ public class LoginActivity extends Activity {
 			String password = params[1];
 			try {
 				Log.i("LoginActivity: AsyncTask", "usuario: " + username + " password: " + password);
-				onAuthenticationResult(AccountNetwork.authenticate(username, password));
+				onAuthenticationResult(AccountNetwork.login(username, password));
+			
             } catch (Exception ex) {
                 Log.e("LoginActivity", "UserLoginTask.doInBackground: failed to authenticate");
                 Log.i("LoginActivity", ex.toString());

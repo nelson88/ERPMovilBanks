@@ -8,7 +8,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.util.Log;
 
 import com.example.erpmovilbanks.http.SoapCaller;
@@ -23,7 +22,7 @@ public class AccountNetwork {
 		
 		private static String TAG = "AccountNetwork";
 		
-		public AccountNetwork(Context context, Handler handler){
+		public AccountNetwork(Context context){
 			this.c = context;
 		}
 		

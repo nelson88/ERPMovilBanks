@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 	
-	private Boolean mRequestNewAccount = false;
+	//private Boolean mRequestNewAccount = true;
 	private Boolean mConfirmCredentials = false;
 	private AccountManager accountManager;
 	private String authTokenType;
@@ -108,22 +108,21 @@ public class LoginActivity extends Activity {
 		
 		SharedPreferences sharedpreferences = getSharedPreferences("authenticator", MODE_PRIVATE);
 		final Account account = new Account(mUser, ConstantsAccount.ACCOUNT_TYPE);
-		
-		if(mRequestNewAccount){
-			accountManager.addAccountExplicitly(account, mPassword, null);
-			
+		Log.i("LoginActiviy", "entra al finishLogin");
+			//accountManager.addAccountExplicitly(account, mPassword, null);
+			//Log.i("LoginActiviy", "despues de la linea accountManager: " + accountManager.toString());
 			Bundle extras = new Bundle();
 			extras.putString(AccountManager.KEY_ACCOUNT_NAME, mUser);
 			extras.putString(AccountManager.KEY_ACCOUNT_TYPE, authTokenType);
 			extras.putString(AccountManager.KEY_AUTHTOKEN, authToken);
 			
 			setAccountAuthenticatorResult(extras);
+			Log.i("LoginActivity", "extras: " + extras.toString());
 			setResult(RESULT_OK);
 			
 			SharedPreferences.Editor auth = sharedpreferences.edit();
 			auth.putBoolean("authenticator", true);
 			auth.commit();
-		}
 	}
 	
 	public final void setAccountAuthenticatorResult(Bundle result){

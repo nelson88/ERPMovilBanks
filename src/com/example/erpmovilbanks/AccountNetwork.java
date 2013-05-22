@@ -18,7 +18,7 @@ public class AccountNetwork {
 		private static final String NAMESPACE = "http://asp.net/ApplicationServices/v200";
 		private static final String METHOD_NAME = "Login";
 		private static final String SOAP_ACTION = "http://asp.net/ApplicationServices/v200/AuthenticationService/Login";
-		private static Context c;
+		private Context c;
 		private static AccountNetwork instance;
 		private static String TAG = "AccountNetwork";
 		
@@ -39,7 +39,7 @@ public class AccountNetwork {
 		public String login(String mUser, String mPassword){
 			try {
 				Log.i("AccountNetwork", "context: " + c);
-				authenticate(c, mUser, mPassword);
+				return authenticate(c, mUser, mPassword);
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (XmlPullParserException e) {

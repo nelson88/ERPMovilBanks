@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
+	
 	private Boolean mRequestNewAccount = false;
 	private Boolean mConfirmCredentials = false;
 	private AccountManager accountManager;
@@ -51,21 +52,10 @@ public class LoginActivity extends Activity {
 				} 
 				
 				else {
-					/*SharedPreferences.Editor auth = sharedpreferences.edit();
-					auth.putBoolean("authenticator", true);
-					auth.commit();
-					Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-					startActivity(intent);*/
 					Log.i("LoginActivity", "onClick:");
 					AuthAsyncTask task = new AuthAsyncTask();
 					task.execute(mUser, mPassword);
 				} 
-				
-				/*else {
-					Toast.makeText(LoginActivity.this, R.string.user_incorrect, Toast.LENGTH_SHORT).show();
-				}*/
-				
-				
 			}
 			
 		});
@@ -89,7 +79,8 @@ public class LoginActivity extends Activity {
 			String password = params[1];
 			try {
 				Log.i("LoginActivity: AsyncTask", "usuario: " + username + " password: " + password);
-				onAuthenticationResult(AccountNetwork.login(username, password));
+				
+				onAuthenticationResult(AccountNetwork.getInstance(LoginActivity.this).login(username, password)); 
 			
             } catch (Exception ex) {
                 Log.e("LoginActivity", "UserLoginTask.doInBackground: failed to authenticate");
@@ -102,9 +93,10 @@ public class LoginActivity extends Activity {
 	}
 	
 	public void onAuthenticationResult(String authToken){
-		
+		Log.i("LoginActivity", "authoToken: " + authToken);
 		if(authToken != null){
 			if(!mConfirmCredentials){
+				Log.i("LoginActivity", "entra al if onAuthenticationResult");
 				finishLogin(authToken);
 			} else {
 				Toast.makeText(getApplication(), "", Toast.LENGTH_LONG).show();

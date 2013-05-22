@@ -34,6 +34,7 @@ public class SoapCaller {
 		
 		try {
 			responseHeaders = androidHttpTransportSE.call(configuration.getSoapAction(), enveloped, null);
+			Log.i("SoapCaller", "responseHeaders: " + responseHeaders);
 		} catch (IOException e) {
 			Log.i("SoapCaller", "IOException e: " + e);
 			e.printStackTrace();
@@ -44,14 +45,15 @@ public class SoapCaller {
 		
 		try {
 			Object response = enveloped.getResponse();
+			
+			Log.i("SoapCaller", "response: " + response.toString());
+			return response.toString();
 		} catch (SoapFault e) {
 			Log.i("SoapCaller", "SoapFault e: " + e);
 			e.printStackTrace();
 		}
 		
-		Log.i(TAG, "request: " + request.toString());
-		return request.toString();
-		
+		return null;
 	}
 	
 	public List getResponseHeaders(){

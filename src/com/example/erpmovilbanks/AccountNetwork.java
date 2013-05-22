@@ -19,14 +19,24 @@ public class AccountNetwork {
 		private static final String METHOD_NAME = "Login";
 		private static final String SOAP_ACTION = "http://asp.net/ApplicationServices/v200/AuthenticationService/Login";
 		private static Context c;
-		
+		private static AccountNetwork instance;
 		private static String TAG = "AccountNetwork";
 		
+
 		public AccountNetwork(Context context){
 			this.c = context;
 		}
 		
-		public static String login(String mUser, String mPassword){
+		public static AccountNetwork getInstance(Context context){
+			Log.i("AccountNetwork", " getInstance");
+			if(instance == null){
+				instance = new AccountNetwork(context.getApplicationContext());
+			}
+			Log.i("AccountNetwork", "instance: " + instance);
+			return instance;
+		}
+		
+		public String login(String mUser, String mPassword){
 			try {
 				Log.i("AccountNetwork", "context: " + c);
 				authenticate(c, mUser, mPassword);
@@ -52,14 +62,12 @@ public class AccountNetwork {
 		
 			Object response;
 		
-			String res = getServiceURL(context, "/login/AuthenticationService.svc");
-			Log.i(TAG, "RES: " + res);
-		
-			response = caller.request(res, soapCallConfiguration);
+			response = caller.request(getServiceURL(context, "/login/AuthenticationService.svc"), soapCallConfiguration);
 
 			Log.i(TAG, "response: " + response);
 			
 			if(response != null && response.equals("true")){
+				Log.i("AccountNetwork", "entro al if");
 				List<HeaderProperty> responseHeaders = caller.getResponseHeaders();
 			
 				SharedPreferences settings = context.getSharedPreferences("ERP_PREFERENCES", Context.MODE_PRIVATE);
@@ -74,12 +82,14 @@ public class AccountNetwork {
 				String sessionId = value.split(";")[0];
 				String aspxauth = value.split(";")[2];
 			
+				Log.i("AccountNetwork", "sessionId: " + sessionId + " aspxauth: " + aspxauth);
 				String authtoken = aspxauth.split("=")[0].replaceAll(" HttpOnly", "")+"="+aspxauth.split("=")[1]+";"+sessionId;
 				editor.putString("set-cookies", value);
 				editor.putString("authtoken", authtoken);
 			
 				editor.commit();
 			
+				Log.i("AccountNetwork", "authToken: " + authtoken);
 				return authtoken;
 				}
 			return null;
@@ -87,6 +97,11 @@ public class AccountNetwork {
 	
 		public static String getServiceURL(Context context, String service){
 			Log.i(TAG, "getServiceURL " + "context: " + context + " service: " + service.toString());
-			return context.getString(R.string.server) + service;
+			try {
+				return context.getString(R.string.server) + service;
+			} catch (Exception e) {
+				Log.i("nelson", "exception: " + e);
 			}
+		return null;
+		}
 		}

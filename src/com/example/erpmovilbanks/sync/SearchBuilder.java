@@ -78,7 +78,6 @@ public class SearchBuilder implements RequestBuilder {
 	
 	@Override
 	public String getRequestObject() {
-		// TODO Auto-generated method stub
-		return null;
+		return requestObject.toString();
 	}
 }

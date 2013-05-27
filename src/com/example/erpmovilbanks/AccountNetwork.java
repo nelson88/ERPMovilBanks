@@ -6,6 +6,8 @@ import java.util.List;
 import org.ksoap2.HeaderProperty;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -49,6 +51,12 @@ public class AccountNetwork {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} catch (XmlPullParserException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (OperationCanceledException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (AuthenticatorException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}

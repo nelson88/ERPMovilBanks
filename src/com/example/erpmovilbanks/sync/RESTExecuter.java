@@ -25,10 +25,11 @@ public class RESTExecuter {
 		restHttpCall = new HttpCaller();
 
 	}
+	
 	public int executeRequest(Map<String, Object> parameters) throws JSONException, UnsupportedEncodingException{
-		
+		Log.i(TAG, "executeRequest");
 		JSONObject jsonResponse = null;
-		
+		Log.i(TAG, "executeRequest");
 		RequestBuilder requestBuilder = null;
 		
 		Log.i(TAG, "executeRequest");
@@ -74,6 +75,7 @@ public class RESTExecuter {
 	public String getAuthCookie(){
 		SharedPreferences settings = context.getSharedPreferences("ERP_PREFERENCES", Context.MODE_PRIVATE);
 		String authtoken = settings.getString("authtoken", "");
+		Log.i("RESTExecuter", "getAuthCookie authtoken: " + authtoken);
 		
 		return authtoken;
 	}

@@ -32,11 +32,13 @@ public class HttpCaller {
 		HttpConnectionParams.setSoTimeout(httpParameters, 10000);
 		
 		JSONObject json = null;
-		Log.i(TAG, "request");
 		HttpClient httpClient = new DefaultHttpClient(httpParameters);
+		Log.i(TAG, "request httpClient: " + httpClient);
 		HttpPost httpPost = new HttpPost(url);
-		Log.i(TAG, "despues del post");
+		Log.i(TAG, "despues del post: httpPost " + httpPost);
 		try {
+			Log.i("HttpCaller", "Toolkit: " + getUserAgent());
+			Log.i("HttpCaller", "Cookie: " + cookieString);
 			StringEntity se = new StringEntity(jsonParameter, "UTF-8");
 			httpPost.setEntity(se);
 			httpPost.setHeader("User-Agent", getUserAgent());

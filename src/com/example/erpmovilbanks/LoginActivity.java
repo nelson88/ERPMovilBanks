@@ -1,10 +1,20 @@
 package com.example.erpmovilbanks;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.example.erpmovilbanks.auth.ConstantsAccount;
+import com.example.erpmovilbanks.sync.ERPContract;
+import com.example.erpmovilbanks.sync.RESTExecuter;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,9 +31,9 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 	
-	private Boolean mRequestNewAccount = true;
-	public static final String PARAM_USERNAME = "username";
 	private Boolean mConfirmCredentials = false;
+	private static final boolean NOTIFY_AUTH_FAILURE = true;
+	private RESTExecuter restExecuter;
 	private AccountManager accountManager;
 	private String authTokenType;
 	private Bundle mResultBundle = null;
@@ -40,11 +50,9 @@ public class LoginActivity extends Activity {
 		authTokenType = ConstantsAccount.ACCOUNT_TYPE;
 		loadDefaultValues();
 		final SharedPreferences sharedpreferences = getSharedPreferences("authenticator", MODE_PRIVATE);
+		restExecuter = new RESTExecuter(getBaseContext());
 		
 		Button Blogin = (Button) findViewById(R.id.Blogin);
-		final Intent intent = getIntent();
-		mUser = intent.getStringExtra(PARAM_USERNAME);
-		mRequestNewAccount = mUser == null;
 		
 		Blogin.setOnClickListener(new OnClickListener(){
 
@@ -106,13 +114,15 @@ public class LoginActivity extends Activity {
 		
 	}*/
 	
-	public void onAuthenticationResult(String authToken){
+	public void onAuthenticationResult(String authToken) throws OperationCanceledException, AuthenticatorException, IOException{
 		Log.i("LoginActivity", "authoToken: " + authToken);
 		if(authToken != null){
 			if(!mConfirmCredentials){
 				Log.i("LoginActivity", "entra al if onAuthenticationResult");
 				finishLogin(authToken);
 				Log.i("LoginActivity", "onAuthenticationResult return del finixhLogin");
+				AuthAsyncTaskSync task = new AuthAsyncTaskSync();
+				task.execute(authToken);
 				
 			} else {
 				Toast.makeText(getApplication(), "", Toast.LENGTH_LONG).show();
@@ -126,12 +136,7 @@ public class LoginActivity extends Activity {
 		final Account account = new Account(mUser, ConstantsAccount.ACCOUNT_TYPE);
 		Log.i("LoginActivity", "account: " + account.toString());
 		Log.i("LoginActivity", "mPassword: " + mPassword);
-		if(mRequestNewAccount){
-			ContentResolver.setSyncAutomatically(account, "com.example.erpmovilbanks", true);
-		} else {
-			accountManager.setPassword(account, mPassword);
-		}
-		
+		accountManager.setPassword(account, mPassword);
 		Log.i("LoginActiviy", "entra al finishLogin");
 			//accountManager.addAccountExplicitly(account, mPassword, null);
 			//Log.i("LoginActiviy", "despues de la linea accountManager: " + accountManager.toString());
@@ -155,5 +160,40 @@ public class LoginActivity extends Activity {
 	public final void setAccountAuthenticatorResult(Bundle result){
 		mResultBundle = result;
 	}
+	
+	 class AuthAsyncTaskSync extends AsyncTask<String, Void, Void> {
+
+			//ProgressDialog progress;
+			
+			/*protected void onPreExecute(){
+				//progress = ProgressDialog.show(LoginActivity.this, "", "Loading please wait...");
+				//progress.setCancelable(true);
+			}*/
+			
+			@Override
+			protected Void doInBackground(String... params) {
+				String authoken = params[0];
+				
+				try {
+					Log.i("LoginActivity", "doInBackground");
+					//final Account account = new Account(mUser, ConstantsAccount.ACCOUNT_TYPE);
+					//final String authtToken = accountManager.blockingGetAuthToken(account, ConstantsAccount.AUTHTOKEN_TYPE, NOTIFY_AUTH_FAILURE);
+					Log.i("LoginActivity", "authtToken: " + authoken);
+					Map<String, Object> paramMap = new HashMap<String, Object>();
+					paramMap.put(ERPContract.SORT_PARAM, "Date");
+					paramMap.put(ERPContract.SCHEMA_PARAM, "Core");
+					paramMap.put(ERPContract.TABLE_PARAM, "RepositoryExpenseReport");
+					
+					Log.i("LoginActivity", "paramMap: " + paramMap.toString());
+					
+					restExecuter.executeRequest(paramMap);
+					
+	            } catch (Exception ex) {
+	                Log.e("LoginActivity", "UserLoginTask.doInBackground: failed to authenticate");
+	                Log.i("LoginActivity", ex.toString());
+	            }
+				return null;
+			}
+	 }
 
 }

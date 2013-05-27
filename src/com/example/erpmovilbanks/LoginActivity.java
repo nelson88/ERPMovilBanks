@@ -6,6 +6,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +34,8 @@ public class LoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		accountManager = AccountManager.get(this);
+		authTokenType = ConstantsAccount.ACCOUNT_TYPE;
 		loadDefaultValues();
 		final SharedPreferences sharedpreferences = getSharedPreferences("authenticator", MODE_PRIVATE);
 		
@@ -53,8 +56,9 @@ public class LoginActivity extends Activity {
 				
 				else {
 					Log.i("LoginActivity", "onClick:");
-					AuthAsyncTask task = new AuthAsyncTask();
-					task.execute(mUser, mPassword);
+					new AccountNetwork(LoginActivity.this).login(mUser, mPassword); 
+					/*AuthAsyncTask task = new AuthAsyncTask();
+					task.execute(mUser, mPassword);*/
 				} 
 			}
 			
@@ -71,7 +75,7 @@ public class LoginActivity extends Activity {
 
 	}
 	
-	class AuthAsyncTask extends AsyncTask<String, Void, String>{
+	/*class AuthAsyncTask extends AsyncTask<String, Void, String>{
 		
 		@Override
 		protected String doInBackground(String... params) {
@@ -80,17 +84,22 @@ public class LoginActivity extends Activity {
 			try {
 				Log.i("LoginActivity: AsyncTask", "usuario: " + username + " password: " + password);
 				
-				onAuthenticationResult(AccountNetwork.getInstance(LoginActivity.this).login(username, password)); 
-			
+				return AccountNetwork.getInstance(LoginActivity.this).login(mUser, mPassword);
+				
             } catch (Exception ex) {
                 Log.e("LoginActivity", "UserLoginTask.doInBackground: failed to authenticate");
                 Log.i("LoginActivity", ex.toString());
                 return null;
             }
-			return null;
 		}
 		
-	}
+		protected void onPosExecute(final String authToken){
+			Log.i("LoginActivity", "onPostExecute");
+			onAuthenticationResult(authToken);
+			Log.i("LoginActivity", "onPostExecute return");
+		}
+		
+	}*/
 	
 	public void onAuthenticationResult(String authToken){
 		Log.i("LoginActivity", "authoToken: " + authToken);
@@ -98,6 +107,7 @@ public class LoginActivity extends Activity {
 			if(!mConfirmCredentials){
 				Log.i("LoginActivity", "entra al if onAuthenticationResult");
 				finishLogin(authToken);
+				Log.i("LoginActivity", "onAuthenticationResult return del finixhLogin");
 			} else {
 				Toast.makeText(getApplication(), "", Toast.LENGTH_LONG).show();
 			}
@@ -108,6 +118,9 @@ public class LoginActivity extends Activity {
 		
 		SharedPreferences sharedpreferences = getSharedPreferences("authenticator", MODE_PRIVATE);
 		final Account account = new Account(mUser, ConstantsAccount.ACCOUNT_TYPE);
+		Log.i("LoginActivity", "account: " + account.toString());
+		Log.i("LoginActivity", "mPassword: " + mPassword);
+		accountManager.setPassword(account, mPassword);
 		Log.i("LoginActiviy", "entra al finishLogin");
 			//accountManager.addAccountExplicitly(account, mPassword, null);
 			//Log.i("LoginActiviy", "despues de la linea accountManager: " + accountManager.toString());
@@ -120,9 +133,12 @@ public class LoginActivity extends Activity {
 			Log.i("LoginActivity", "extras: " + extras.toString());
 			setResult(RESULT_OK);
 			
-			SharedPreferences.Editor auth = sharedpreferences.edit();
+			/*SharedPreferences.Editor auth = sharedpreferences.edit();
+			
 			auth.putBoolean("authenticator", true);
 			auth.commit();
+			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+			startActivity(intent);*/
 	}
 	
 	public final void setAccountAuthenticatorResult(Bundle result){

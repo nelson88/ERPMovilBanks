@@ -36,20 +36,33 @@ public class AccountNetwork {
 			return instance;
 		}
 		
-		public String login(String mUser, String mPassword){
-			try {
+		public void login(final String mUser, final String mPassword){
+
 				Log.i("AccountNetwork", "context: " + c);
-				return authenticate(c, mUser, mPassword);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (XmlPullParserException e) {
-				e.printStackTrace();
-			}
-			return null;
+
+
+				Runnable accountNetwork = new Runnable(){
+					public void run(){
+						try {
+							((LoginActivity) c).onAuthenticationResult(authenticate(c, mUser, mPassword));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (XmlPullParserException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				};
+				
+				Thread t = new Thread(accountNetwork);
+				t.start();
+
 		}
 		
 		public static String authenticate(Context context, String mUser, String mPassowrd) throws IOException, XmlPullParserException{
 		
+			Log.i("AccountNetwork", "Authenticate");
 			SoapCaller caller = new SoapCaller();
 	
 			SoapParameter soapCallConfiguration = new SoapParameter(NAMESPACE, METHOD_NAME, SOAP_ACTION);

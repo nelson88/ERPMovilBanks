@@ -1,5 +1,10 @@
 package com.example.erpmovilbanks.auth;
 
+import java.io.IOException;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import com.example.erpmovilbanks.AccountNetwork;
 import com.example.erpmovilbanks.LoginActivity;
 
 import android.accounts.AbstractAccountAuthenticator;
@@ -12,13 +17,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 public class AuthenticatorService extends Service {
 
 	private AccountAuthenticator authenticator;
+	private Context context;
 	
 	public AuthenticatorService(){
+		Log.i("AuthenticatorService", "authenticator");
 		authenticator = new AccountAuthenticator(this);
+
 	}
 	
 	@Override
@@ -40,6 +49,7 @@ public class AuthenticatorService extends Service {
 				String accountType, String authTokenType,
 				String[] requiredFeatures, Bundle options)
 				throws NetworkErrorException {
+			Log.i("AuthenticatorService", "addAccount: ");
 			Bundle extras = new Bundle();
 			
 			Intent intent = new Intent(c, LoginActivity.class);
@@ -66,8 +76,47 @@ public class AuthenticatorService extends Service {
 		public Bundle getAuthToken(AccountAuthenticatorResponse response,
 				Account account, String authTokenType, Bundle options)
 				throws NetworkErrorException {
-			// TODO Auto-generated method stub
-			return null;
+			Log.i("Auth", "getAuthToken");
+			if(!authTokenType.equals(ConstantsAccount.AUTHTOKEN_TYPE))
+			{
+				final Bundle result = new Bundle();
+				result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid authTokenType");
+				
+				return result;
+			}
+			
+			final AccountManager am = AccountManager.get(context);
+			final String password = am.getPassword(account);
+			if(password != null){
+				try {
+					String authToken = AccountNetwork.authenticate(context, account.name, password);
+					
+					if(authToken != null){
+						final Bundle result = new Bundle();
+						result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+						result.putString(AccountManager.KEY_ACCOUNT_TYPE, ConstantsAccount.ACCOUNT_TYPE);
+						result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+						
+						am.setAuthToken(account, ConstantsAccount.ACCOUNT_TYPE, authToken);
+						
+						return result;
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (XmlPullParserException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			final Intent intent = new Intent(context, AuthenticatorService.class);
+			intent.putExtra("username", account.name);
+			intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+			
+			final Bundle bundle = new Bundle();
+			bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+			return bundle;
 		}
 
 		@Override

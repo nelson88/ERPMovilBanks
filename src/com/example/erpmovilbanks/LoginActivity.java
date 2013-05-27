@@ -5,6 +5,7 @@ import com.example.erpmovilbanks.auth.ConstantsAccount;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,7 +21,8 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 	
-	//private Boolean mRequestNewAccount = true;
+	private Boolean mRequestNewAccount = true;
+	public static final String PARAM_USERNAME = "username";
 	private Boolean mConfirmCredentials = false;
 	private AccountManager accountManager;
 	private String authTokenType;
@@ -40,6 +42,9 @@ public class LoginActivity extends Activity {
 		final SharedPreferences sharedpreferences = getSharedPreferences("authenticator", MODE_PRIVATE);
 		
 		Button Blogin = (Button) findViewById(R.id.Blogin);
+		final Intent intent = getIntent();
+		mUser = intent.getStringExtra(PARAM_USERNAME);
+		mRequestNewAccount = mUser == null;
 		
 		Blogin.setOnClickListener(new OnClickListener(){
 
@@ -108,6 +113,7 @@ public class LoginActivity extends Activity {
 				Log.i("LoginActivity", "entra al if onAuthenticationResult");
 				finishLogin(authToken);
 				Log.i("LoginActivity", "onAuthenticationResult return del finixhLogin");
+				
 			} else {
 				Toast.makeText(getApplication(), "", Toast.LENGTH_LONG).show();
 			}
@@ -120,7 +126,12 @@ public class LoginActivity extends Activity {
 		final Account account = new Account(mUser, ConstantsAccount.ACCOUNT_TYPE);
 		Log.i("LoginActivity", "account: " + account.toString());
 		Log.i("LoginActivity", "mPassword: " + mPassword);
-		accountManager.setPassword(account, mPassword);
+		if(mRequestNewAccount){
+			ContentResolver.setSyncAutomatically(account, "com.example.erpmovilbanks", true);
+		} else {
+			accountManager.setPassword(account, mPassword);
+		}
+		
 		Log.i("LoginActiviy", "entra al finishLogin");
 			//accountManager.addAccountExplicitly(account, mPassword, null);
 			//Log.i("LoginActiviy", "despues de la linea accountManager: " + accountManager.toString());

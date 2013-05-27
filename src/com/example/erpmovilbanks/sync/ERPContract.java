@@ -10,5 +10,7 @@ public class ERPContract {
 	public final static String CONDITIONS = "condition";
 	public static final String PLATFORM_NAME = "PlatformName";
 	public static final String MESSAGE_NAME = "MessageName";
+	
+	//public static final String CONTENT_AUTHORITY = "com.example.erpmovilbanks";
 
 }

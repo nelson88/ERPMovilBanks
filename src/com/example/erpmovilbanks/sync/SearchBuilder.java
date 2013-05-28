@@ -6,10 +6,10 @@ import org.json.JSONObject;
 
 public class SearchBuilder implements RequestBuilder {
 
-	static final int LIMIT = 50;
+	static final int LIMIT = 1;
 	static final int START = 0;
 	static final String SEARCH="";
-	static final String DIR="ASC";
+	static final String DIR="DESC";
 	
 	private JSONObject requestObject;
 	private JSONObject queryFilter;

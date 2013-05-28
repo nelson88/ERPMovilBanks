@@ -50,6 +50,7 @@
                 android:resource="@xml/constants" />
         </service>
         <activity android:name="LoginActivity"></activity>
+        <activity android:name=".view.banks_listview"></activity>
     </application>
 
 </manifest>

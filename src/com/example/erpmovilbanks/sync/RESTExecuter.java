@@ -26,10 +26,9 @@ public class RESTExecuter {
 
 	}
 	
-	public int executeRequest(Map<String, Object> parameters) throws JSONException, UnsupportedEncodingException{
-		Log.i(TAG, "executeRequest");
+	public JSONObject executeRequest(Map<String, Object> parameters) throws JSONException, UnsupportedEncodingException{
+		
 		JSONObject jsonResponse = null;
-		Log.i(TAG, "executeRequest");
 		RequestBuilder requestBuilder = null;
 		
 		Log.i(TAG, "executeRequest");
@@ -37,25 +36,30 @@ public class RESTExecuter {
 			requestBuilder = new SearchBuilder((String) parameters.get(ERPContract.SORT_PARAM), (String) parameters.get(ERPContract.SEARCH_PARAM));
 		} else {
 			requestBuilder = new SearchBuilder((String) parameters.get(ERPContract.SORT_PARAM));
+			Log.i("RESTExecute", "en el else del primer if");
 		}
 		
 		Log.i(TAG, "despues del primer if");
 		if(parameters.containsKey(ERPContract.SCHEMA_PARAM)){
 			((SearchBuilder) requestBuilder).setQueryFilter((String) parameters.get(ERPContract.TABLE_PARAM), (String) parameters.get(ERPContract.SCHEMA_PARAM));
+			Log.i("RESTExecute", "en el segundo if");
 		}
 		
 		Log.i(TAG, "despues del segundo if");
 		if(parameters.containsKey(ERPContract.SUMMARY_FIELDS)){
 			((SearchBuilder) requestBuilder).setSummaryFields((String) parameters.get(ERPContract.TABLE_PARAM),
 					URLDecoder.decode((String) parameters.get(ERPContract.SUMMARY_FIELDS), DEFAULT_ENCODING));
+			Log.i("RESTExecute", "en el tercer if");
 		}
 		
 		Log.i(TAG, "despues del tercer if");
 		if(parameters.containsKey(ERPContract.CONDITIONS)){
 			((SearchBuilder) requestBuilder).addConditionWithuriParam(URLDecoder.decode((String) parameters.get(ERPContract.CONDITIONS), DEFAULT_ENCODING));
+			Log.i("RESTExecute", "en el cuarto if");
 		} else if(parameters.containsKey(ERPContract.PLATFORM_NAME) && parameters.containsKey(ERPContract.MESSAGE_NAME)){
 			ExecuteRequest request = new ExecuteRequest(parameters.get(ERPContract.PLATFORM_NAME), parameters.get(ERPContract.MESSAGE_NAME));
 			requestBuilder = new ExecuteBuilder(request);
+			Log.i("RESTExecute", "en el else del cuarto if");
 			
 		}
 		
@@ -64,7 +68,7 @@ public class RESTExecuter {
 		url = AccountNetwork.getServiceURL(getContext(), "/advancedsearch/svc/ERPService.svc/RetrieveMultiple");
 		jsonResponse = restHttpCall.request(url, getAuthCookie(), requestBuilder.getRequestObject());
 		
-		return 0;
+		return jsonResponse;
 		
 	}
 	

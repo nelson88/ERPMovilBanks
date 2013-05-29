@@ -18,9 +18,6 @@ import android.accounts.AccountManager;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -36,10 +33,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
-
-	ArrayList<String> items = new ArrayList<String>();
+	
 	private Boolean mConfirmCredentials = false;
-	private static final boolean NOTIFY_AUTH_FAILURE = true;
 	private RESTExecuter restExecuter;
 	private AccountManager accountManager;
 	private String authTokenType;
@@ -102,8 +97,10 @@ public class LoginActivity extends Activity {
 				Log.i("LoginActivity", "entra al if onAuthenticationResult");
 				finishLogin(authToken);
 				Log.i("LoginActivity", "onAuthenticationResult return del finixhLogin");
-				AuthAsyncTaskSync task = new AuthAsyncTaskSync();
-				task.execute(authToken);
+				Intent intent = new Intent(LoginActivity.this, banks_listview.class);
+				intent.putExtra("authToken", authToken);
+				startActivity(intent);
+				
 				
 			} else {
 				Toast.makeText(getApplication(), "", Toast.LENGTH_LONG).show();
@@ -139,61 +136,4 @@ public class LoginActivity extends Activity {
 	public final void setAccountAuthenticatorResult(Bundle result){
 		mResultBundle = result;
 	}
-	
-	 class AuthAsyncTaskSync extends AsyncTask<String, Void, JSONObject> {
-			
-			@Override
-			protected JSONObject doInBackground(String... params) {
-				String authoken = params[0];
-				JSONObject json = new JSONObject();
-				
-				try {
-					Log.i("LoginActivity", "doInBackground");
-					//final Account account = new Account(mUser, ConstantsAccount.ACCOUNT_TYPE);
-					//final String authtToken = accountManager.blockingGetAuthToken(account, ConstantsAccount.AUTHTOKEN_TYPE, NOTIFY_AUTH_FAILURE);
-					Log.i("LoginActivity", "authtToken: " + authoken);
-					Map<String, Object> paramMap = new HashMap<String, Object>();
-					paramMap.put(ERPContract.SORT_PARAM, "DailyDate");
-					paramMap.put(ERPContract.SCHEMA_PARAM, "Bank");
-					paramMap.put(ERPContract.TABLE_PARAM, "DailyBalance");
-					
-					Log.i("LoginActivity", "paramMap: " + paramMap.toString());
-					
-					json = restExecuter.executeRequest(paramMap);
-					
-					JSONArray Jarray = json.getJSONArray("data");
-					
-					for(int i=0; i<Jarray.length(); i++){
-						JSONObject object = Jarray.getJSONObject(i);
-						
-						String bank_account = object.getString("BankAccount");
-						Double initial_balance = object.getDouble("InitialBalance");
-						Double kinal_balance = object.getDouble("FinalBalance");
-						
-						items.add(bank_account + "\n" + initial_balance + "\t" + kinal_balance);
-						
-						Log.v("--", "BankAccount:" + bank_account + "\n InitialBalance: " + initial_balance
-		                        + "\n  FinalBalance: " + kinal_balance);
-						}
-					Log.i("LoginActivity", "despues del for");
-					} catch (Exception ex) {
-	                Log.e("LoginActivity", "UserLoginTask.doInBackground: failed to authenticate");
-	                Log.i("LoginActivity", ex.toString());
-	            }
-
-				return json;
-			}
-			
-			protected void onPostExecute(JSONObject json){
-				Log.i("LoginActivity", "onPostExecute");
-				ListView myListView = (ListView) findViewById(R.id.banks_listview);
-				Log.i("LoginActivity", "onPostExecute item: " + items.toString());
-				myListView.setAdapter(new ArrayAdapter(getBaseContext(), android.R.layout.simple_expandable_list_item_1, items));
-
-				Intent intent = new Intent(LoginActivity.this, banks_listview.class);
-				startActivity(intent);
-			}
-			
-	 }
-
 }

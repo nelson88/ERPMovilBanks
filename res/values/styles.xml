@@ -17,9 +17,14 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
     
-    <style name="ListView">
-        <item name="android:background">#cfd2d9</item>
-        <item name="android:cacheColorHint">#000000</item>
+    <style name="mylist" parent="@android:style/Widget.ListView">
+        <item name="android:layout_width">fill_parent</item>
+    	<item name="android:layout_height">fill_parent</item>
+    	<item name="android:background">#FFFFFF</item>
+    	<item name="android:dividerHeight">1dp</item>
+    	<item name="android:divider">#CCCCCC</item>
+    	<item name="android:cacheColorHint">#FFFFFF</item>
+    	<item name="android:listSelector">#00000000</item>
     </style>
 
 </resources>

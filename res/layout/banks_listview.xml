@@ -5,11 +5,8 @@
     android:background="@drawable/login_background"
     android:orientation="vertical" >
   <ListView
-    android:id="@+id/banks_listview"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    style="@style/ListView" >"
-
-</ListView>
+            android:id="@+id/listview"
+            style="@style/mylist"
+            android:paddingTop="1dp" />
 
 </LinearLayout>

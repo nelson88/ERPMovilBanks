@@ -51,6 +51,8 @@
         </service>
         <activity android:name="LoginActivity"></activity>
         <activity android:name=".view.banks_listview"></activity>
+        <provider android:name=".db.contentProvider" android:authorities="com.sample.erpmovilbanks"></provider>
+        
     </application>
 
 </manifest>
